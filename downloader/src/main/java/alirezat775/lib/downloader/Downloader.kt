@@ -1,16 +1,14 @@
 package alirezat775.lib.downloader
 
+import alirezat775.lib.downloader.core.DownloadTask
 import alirezat775.lib.downloader.core.OnDownloadListener
 import alirezat775.lib.downloader.core.database.DownloaderDao
 import android.Manifest
 import android.content.Context
 import android.os.AsyncTask
-import android.util.Pair
 import androidx.annotation.CheckResult
 import androidx.annotation.RequiresPermission
-import java.io.File
-import java.lang.ref.SoftReference
-import java.net.HttpURLConnection
+import java.lang.ref.WeakReference
 import java.net.MalformedURLException
 
 /**
@@ -19,102 +17,56 @@ import java.net.MalformedURLException
  * Email:   alirezat775@gmail.com
  */
 
-class Downloader private constructor(downloadTask: DownloadTask) {
+class Downloader private constructor(private val downloadTask: DownloadTask) : IDownload {
 
-    private var downloadTask: DownloadTask? = null
+    //region field
+    private var mDownloadTask: DownloadTask? = null
 
+    //endregion
+
+    //region initialize
     init {
-        if (this.downloadTask == null) {
-            this.downloadTask = downloadTask
-        }
+        rebuild()
     }
+    //endregion
 
+    //region method interface
     @RequiresPermission(Manifest.permission.INTERNET)
-    fun download() {
-        if (downloadTask == null) {
-            throw IllegalStateException("rebuild new instance after \"pause or cancel\" download")
-        }
-        downloadTask!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    override fun download() {
+        rebuild()
+        mDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
-    fun cancelDownload() {
-        if (downloadTask != null) {
-            downloadTask!!.cancel()
-            downloadTask = null
-        }
+    override fun cancelDownload() {
+        mDownloadTask?.cancel()
+        mDownloadTask = null
     }
 
-    fun pauseDownload() {
-        if (downloadTask != null) {
-            downloadTask!!.pause()
-            downloadTask = null
-        }
+    override fun pauseDownload() {
+        mDownloadTask?.pause()
+        mDownloadTask = null
     }
 
-    fun resumeDownload() {
-        if (downloadTask != null) downloadTask!!.resume = true
+    override fun resumeDownload() {
         download()
+        mDownloadTask?.resume = true
+    }
+    //endregion
+
+    private fun rebuild() {
+        mDownloadTask = downloadTask.copy()
     }
 
-    private class DownloadTask : AsyncTask<Void, Void, Pair<Boolean, Exception>>() {
-        var context: SoftReference<Context>? = null
-        internal var resume = false
-        internal var dao: DownloaderDao? = null
-        internal var downloadDir: String? = null
-        internal var fileName: String? = null
-        internal var extension: String? = null
-        internal var stringURL: String? = null
-        internal var timeOut: Int = 0
-        internal var downloadListener: OnDownloadListener? = null
-        internal var header: Map<String, String>? = null
-        private var connection: HttpURLConnection? = null
-        private var downloadedFile: File? = null
-        private var downloadedSize: Int? = 0
-        private var percent: Int? = 0
-        private var totalSize: Int? = 0
+    class Builder(private val mContext: Context, private var mUrl: String) {
 
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
-
-        override fun doInBackground(vararg voids: Void): Pair<Boolean, Exception> {
-            return Pair<Boolean, Exception>(true, null)
-        }
-
-        override fun onPostExecute(result: Pair<Boolean, Exception>) {
-            super.onPostExecute(result)
-        }
-
-        override fun onCancelled() {
-            super.onCancelled()
-            if (connection != null) connection!!.disconnect()
-        }
-
-        override fun onCancelled(booleanExceptionPair: Pair<Boolean, Exception>) {
-            super.onCancelled(booleanExceptionPair)
-            if (connection != null) connection!!.disconnect()
-        }
-
-        internal fun cancel() {
-        }
-
-        internal fun pause() {
-            cancel(true)
-        }
-    }
-
-    class Builder
-    /**
-     * @param context the best practice is passing application context
-     * @param url     passing url of the download file
-     */
-        (private val mContext: Context, private val mUrl: String) {
+        //region field
         private var mTimeOut: Int = 0
         private var mDownloadDir: String? = null
         private var mFileName: String? = null
         private var mExtension: String? = null
         private var mDownloadListener: OnDownloadListener? = null
         private var mHeader: Map<String, String>? = null
+        //endregion
 
         /**
          * @param downloadDir for setting custom download directory (default value is sandbox/download/ directory)
@@ -125,7 +77,6 @@ class Downloader private constructor(downloadTask: DownloadTask) {
             this.mDownloadDir = downloadDir
             return this
         }
-
 
         /**
          * @param downloadListener an event listener for tracking download events
@@ -170,24 +121,28 @@ class Downloader private constructor(downloadTask: DownloadTask) {
         }
 
         fun build(): Downloader {
-            val downloadTask = DownloadTask()
-            downloadTask.dao = DownloaderDao.getInstance(mContext)
-            downloadTask.timeOut = mTimeOut
-            downloadTask.downloadListener = mDownloadListener
-            downloadTask.fileName = mFileName
-            downloadTask.header = mHeader
-            downloadTask.extension = mExtension
-            downloadTask.context = SoftReference(mContext)
-            if (mDownloadDir == null || mDownloadDir!!.isEmpty()) {
-                downloadTask.downloadDir = mContext.getExternalFilesDir(null).toString()
-            } else
-                downloadTask.downloadDir = mDownloadDir
-
-            if (mUrl.isEmpty()) {
+            mUrl = if (mUrl.isEmpty()) {
                 throw MalformedURLException("The entered URL is not valid")
             } else {
-                downloadTask.stringURL = mUrl
+                mUrl
             }
+
+            mDownloadDir = if (mDownloadDir == null || mDownloadDir!!.isEmpty()) {
+                mContext.getExternalFilesDir(null)?.toString()
+            } else
+                mDownloadDir
+
+            val downloadTask = DownloadTask(
+                mUrl,
+                WeakReference(mContext),
+                DownloaderDao.getInstance(mContext),
+                mDownloadDir,
+                mTimeOut,
+                mDownloadListener,
+                mHeader,
+                "",
+                ""
+            )
             return Downloader(downloadTask)
         }
     }

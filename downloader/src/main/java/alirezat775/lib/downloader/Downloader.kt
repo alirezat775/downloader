@@ -87,6 +87,16 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
         }
 
         /**
+         * @param downloadListener remove listener
+         * @return builder
+         */
+        @CheckResult
+        fun removeDownloadListener(): Builder {
+            this.mDownloadListener = null
+            return this
+        }
+
+        /**
          * @param fileName  for saving with this name
          * @param extension extension of the file
          * @return builder

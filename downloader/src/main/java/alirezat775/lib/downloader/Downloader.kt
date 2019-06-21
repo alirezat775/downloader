@@ -3,6 +3,7 @@ package alirezat775.lib.downloader
 import alirezat775.lib.downloader.core.DownloadTask
 import alirezat775.lib.downloader.core.OnDownloadListener
 import alirezat775.lib.downloader.core.database.DownloaderDao
+import alirezat775.lib.downloader.helper.ConnectionHelper
 import android.Manifest
 import android.content.Context
 import android.os.AsyncTask
@@ -34,7 +35,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
     @RequiresPermission(Manifest.permission.INTERNET)
     override fun download() {
         if (mDownloadTask == null)
-            throw IllegalAccessException("rebuild new instance after \"pause or cancel\" download")
+            throw IllegalAccessException("Rebuild new instance after \"pause or cancel\" download")
         mDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -118,16 +119,17 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
         }
 
         fun build(): Downloader {
-            mUrl = if (mUrl.isEmpty()) {
-                throw MalformedURLException("The entered URL is not valid")
-            } else {
-                mUrl
-            }
+            mUrl =
+                if (mUrl.isEmpty()) throw MalformedURLException("The entered URL is not valid")
+                else mUrl
 
-            mDownloadDir = if (mDownloadDir == null || mDownloadDir!!.isEmpty()) {
-                mContext.getExternalFilesDir(null)?.toString()
-            } else
-                mDownloadDir
+            mDownloadDir =
+                if (mDownloadDir == null || mDownloadDir!!.isEmpty()) mContext.getExternalFilesDir(null)?.toString()
+                else mDownloadDir
+
+            mTimeOut =
+                if (mTimeOut == 0) ConnectionHelper.TIME_OUT_CONNECTION
+                else mTimeOut
 
             val downloadTask = DownloadTask(
                 mUrl,

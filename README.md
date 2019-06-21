@@ -1,7 +1,7 @@
 # Downloader
 
 --------------------------------------------------------------------
-Useful library for showing list in sliding mode or carousel mode
+Useful library for downloading file, mp3, mp4, ..... any file
 
 Options
 - pause, resume, cancel, queue 
@@ -13,8 +13,8 @@ Options
 - event every action (onStart, onPause, onResume, onProgress, onComplete, onFailure, onCancel)
 
 ### Issue
-[bug report](.github/ISSUE_TEMPLATE/bug_report.md)
-[feature request](.github/ISSUE_TEMPLATE/feature_request.md)
+- [bug report](.github/ISSUE_TEMPLATE/bug_report.md)
+- [feature request](.github/ISSUE_TEMPLATE/feature_request.md)
 
 
 ### Usage

@@ -62,8 +62,8 @@ internal data class DownloadTask(
             // open connection
             connection = mUrl.openConnection() as HttpURLConnection
             connection?.doInput = true
-            connection?.readTimeout = if (timeOut == 0) ConnectionHelper.TIME_OUT_CONNECTION else timeOut
-            connection?.connectTimeout = if (timeOut == 0) ConnectionHelper.TIME_OUT_CONNECTION else timeOut
+            connection?.readTimeout = timeOut
+            connection?.connectTimeout = timeOut
             connection?.requestMethod = ConnectionHelper.GET
 
             //set header request
@@ -87,8 +87,21 @@ internal data class DownloadTask(
 
             // get filename and file extension
             val contentType = connection?.getHeaderField("Content-Type").toString()
-            if (fileName == null || fileName!!.isEmpty()) {
-                fileName = System.currentTimeMillis().toString()
+            if (fileName == null) {
+
+                val raw = connection?.getHeaderField("Content-Disposition")
+                if (raw?.indexOf("=") != -1) {
+                    fileName = raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()?.get(1)
+                }
+
+                if (fileName == null) {
+                    fileName = url.substringAfterLast("/")
+                }
+
+                fileName =
+                    if (fileName == null) System.currentTimeMillis().toString()
+                    else fileName
+
                 extension = MimeHelper.guessExtensionFromMimeType(contentType)
             }
 
@@ -120,7 +133,7 @@ internal data class DownloadTask(
             while (bufferedInputStream.read(buffer, 0, 1024) >= 0 && !isCancelled) {
                 len = bufferedInputStream.read(buffer, 0, 1024)
                 if (!ConnectCheckerHelper.isInternetAvailable(context.get()!!)) {
-                    return Pair(false, IllegalStateException("please check your network!"))
+                    return Pair(false, IllegalStateException("Please check your network!"))
                 }
                 bufferedOutputStream.write(buffer, 0, len)
                 downloadedSize = downloadedSize.plus(len)

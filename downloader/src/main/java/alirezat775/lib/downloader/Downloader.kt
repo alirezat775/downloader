@@ -3,13 +3,26 @@ package alirezat775.lib.downloader
 import alirezat775.lib.downloader.core.DownloadTask
 import alirezat775.lib.downloader.core.OnDownloadListener
 import alirezat775.lib.downloader.core.database.DownloaderDao
+import alirezat775.lib.downloader.core.model.FileModel
+import alirezat775.lib.downloader.core.model.StatusModel
+import alirezat775.lib.downloader.helper.ConnectionHelper
+import alirezat775.lib.downloader.helper.MimeHelper
 import android.Manifest
 import android.content.Context
 import android.os.AsyncTask
+import android.util.Pair
 import androidx.annotation.CheckResult
 import androidx.annotation.RequiresPermission
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.ref.SoftReference
 import java.lang.ref.WeakReference
+import java.net.HttpURLConnection
 import java.net.MalformedURLException
+import java.net.ProtocolException
+import java.net.URL
 
 /**
  * Author:  Alireza Tizfahm Fard
@@ -25,14 +38,15 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
 
     //region initialize
     init {
-        rebuild()
+        if (mDownloadTask == null)
+            mDownloadTask = downloadTask
     }
     //endregion
 
     //region method interface
     @RequiresPermission(Manifest.permission.INTERNET)
     override fun download() {
-        rebuild()
+        if (mDownloadTask == null) throw IllegalAccessException("please create new instance")
         mDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -47,8 +61,8 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
     }
 
     override fun resumeDownload() {
-        download()
         mDownloadTask?.resume = true
+        download()
     }
     //endregion
 
@@ -72,7 +86,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
          * @return builder
          */
         @CheckResult
-        fun setDownloadDir(downloadDir: String): Builder {
+        fun downloadDirectory(downloadDir: String): Builder {
             this.mDownloadDir = downloadDir
             return this
         }
@@ -82,7 +96,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
          * @return builder
          */
         @CheckResult
-        fun setDownloadListener(downloadListener: OnDownloadListener): Builder {
+        fun downloadListener(downloadListener: OnDownloadListener): Builder {
             this.mDownloadListener = downloadListener
             return this
         }
@@ -93,7 +107,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
          * @return builder
          */
         @CheckResult
-        fun setFileName(fileName: String, extension: String): Builder {
+        fun fileName(fileName: String, extension: String): Builder {
             this.mFileName = fileName
             this.mExtension = extension
             return this
@@ -104,7 +118,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
          * @return builder
          */
         @CheckResult
-        fun setHeader(header: Map<String, String>): Builder {
+        fun header(header: Map<String, String>): Builder {
             this.mHeader = header
             return this
         }
@@ -114,7 +128,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
          * @return Builder
          */
         @CheckResult
-        fun setTimeOut(timeOut: Int): Builder {
+        fun timeOut(timeOut: Int): Builder {
             this.mTimeOut = timeOut
             return this
         }
@@ -139,8 +153,8 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
                 mTimeOut,
                 mDownloadListener,
                 mHeader,
-                "",
-                ""
+                mFileName,
+                mExtension
             )
             return Downloader(downloadTask)
         }

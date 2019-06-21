@@ -3,26 +3,13 @@ package alirezat775.lib.downloader
 import alirezat775.lib.downloader.core.DownloadTask
 import alirezat775.lib.downloader.core.OnDownloadListener
 import alirezat775.lib.downloader.core.database.DownloaderDao
-import alirezat775.lib.downloader.core.model.FileModel
-import alirezat775.lib.downloader.core.model.StatusModel
-import alirezat775.lib.downloader.helper.ConnectionHelper
-import alirezat775.lib.downloader.helper.MimeHelper
 import android.Manifest
 import android.content.Context
 import android.os.AsyncTask
-import android.util.Pair
 import androidx.annotation.CheckResult
 import androidx.annotation.RequiresPermission
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.lang.ref.SoftReference
 import java.lang.ref.WeakReference
-import java.net.HttpURLConnection
 import java.net.MalformedURLException
-import java.net.ProtocolException
-import java.net.URL
 
 /**
  * Author:  Alireza Tizfahm Fard
@@ -46,7 +33,8 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
     //region method interface
     @RequiresPermission(Manifest.permission.INTERNET)
     override fun download() {
-        if (mDownloadTask == null) throw IllegalAccessException("please create new instance")
+        if (mDownloadTask == null)
+            throw IllegalAccessException("rebuild new instance after \"pause or cancel\" download")
         mDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -65,10 +53,6 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
         download()
     }
     //endregion
-
-    private fun rebuild() {
-        mDownloadTask = downloadTask.copy()
-    }
 
     class Builder(private val mContext: Context, private var mUrl: String) {
 

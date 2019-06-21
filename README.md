@@ -1,1 +1,36 @@
-# downloader
+# Downloader
+
+--------------------------------------------------------------------
+Useful library for showing list in sliding mode or carousel mode
+
+Options
+- pause, resume, cancel, queue 
+- multi download
+- add header request
+- set download directory
+- set time out connection
+- show progress download (percent, downloaded size, total size)
+- event every action (onStart, onPause, onResume, onProgress, onComplete, onFailure, onCancel)
+
+### Issue
+[bug report](.github/ISSUE_TEMPLATE/bug_report.md)
+[feature request](.github/ISSUE_TEMPLATE/feature_request.md)
+
+
+### Usage
+
+add to root build.gradle
+```groovy
+
+    maven { url "https://jitpack.io" }
+
+```
+
+add to module build.gradle
+```groovy
+
+    implementation 'com.github.alirezat775:downloader:1.0.0'
+
+```
+
+<img src="https://raw.githubusercontent.com/alirezat775/downloader/master/assets/demo.gif" width="200" height="400" />

@@ -6,10 +6,11 @@ import java.util.regex.Pattern
 
 /**
  * Author:  Alireza Tizfahm Fard
- * Date:    11/3/2017
+ * Date:    21/6/2019
  * Email:   alirezat775@gmail.com
  */
-object MimeHelper {
+
+internal object MimeHelper {
 
     private val mimeTypeToExtensionMap = HashMap<String, String>()
     private val extensionToMimeTypeMap = HashMap<String, String>()

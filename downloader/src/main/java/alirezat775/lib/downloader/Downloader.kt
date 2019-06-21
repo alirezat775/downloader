@@ -13,7 +13,7 @@ import java.net.MalformedURLException
 
 /**
  * Author:  Alireza Tizfahm Fard
- * Date:    11/6/2017
+ * Date:    21/6/2019
  * Email:   alirezat775@gmail.com
  */
 
@@ -21,7 +21,6 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
 
     //region field
     private var mDownloadTask: DownloadTask? = null
-
     //endregion
 
     //region initialize

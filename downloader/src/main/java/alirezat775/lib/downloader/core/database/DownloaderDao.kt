@@ -4,7 +4,13 @@ import alirezat775.lib.downloader.core.model.ColumnModel
 import alirezat775.lib.downloader.core.model.FileModel
 import android.content.Context
 
-class DownloaderDao private constructor(context: Context) {
+/**
+ * Author:  Alireza Tizfahm Fard
+ * Date:    21/6/2019
+ * Email:   alirezat775@gmail.com
+ */
+
+internal class DownloaderDao private constructor(context: Context) {
 
     private var database: DownloaderDatabase = DownloaderDatabase.getInstance(context)
 

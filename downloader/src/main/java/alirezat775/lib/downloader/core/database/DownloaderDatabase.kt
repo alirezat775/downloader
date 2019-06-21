@@ -7,11 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper
 
 /**
  * Author:  Alireza Tizfahm Fard
- * Date:    12/3/18
+ * Date:    21/6/2019
  * Email:   alirezat775@gmail.com
  */
 
-class DownloaderDatabase private constructor(context: Context) :
+internal class DownloaderDatabase private constructor(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {

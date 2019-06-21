@@ -16,6 +16,12 @@ import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * Author:  Alireza Tizfahm Fard
+ * Date:    21/6/2019
+ * Email:   alirezat775@gmail.com
+ */
+
 internal data class DownloadTask(
     val url: String,
     val context: WeakReference<Context>,
@@ -29,6 +35,7 @@ internal data class DownloadTask(
 ) :
     AsyncTask<Void, Void, Pair<Boolean, Exception?>>() {
 
+    // region field
     private val TAG: String = this::class.java.name
     internal var resume: Boolean = false
     private var connection: HttpURLConnection? = null
@@ -36,11 +43,15 @@ internal data class DownloadTask(
     private var downloadedSize: Int? = 0
     private var percent: Int? = 0
     private var totalSize: Int? = 0
+    // endregion
 
     override fun onPreExecute() {
         super.onPreExecute()
+        // check resume file
+        downloadListener?.onStart()
         if (!resume) {
             dao?.insertNewDownload(FileModel(0, url, fileName, StatusModel.NEW, 0, 0, 0))
+            downloadListener?.onResume()
         }
     }
 
@@ -121,12 +132,19 @@ internal data class DownloadTask(
             connection?.disconnect()
             return Pair(true, null)
         } catch (e: Exception) {
+            downloadedFile?.delete()
             return Pair(false, e)
         }
     }
 
     override fun onPostExecute(result: Pair<Boolean, Exception?>) {
         super.onPostExecute(result)
+        if (result.first) {
+            downloadListener?.onCompleted(downloadedFile)
+            dao?.updateDownload(url, StatusModel.SUCCESS, percent!!, downloadedSize!!, totalSize!!)
+        } else {
+            downloadListener?.onFailure(result.second.toString())
+        }
     }
 
     override fun onCancelled() {
@@ -144,5 +162,6 @@ internal data class DownloadTask(
     internal fun pause() {
         cancel(true)
         dao?.updateDownload(url, StatusModel.PAUSE, percent!!, downloadedSize!!, totalSize!!)
+        downloadListener?.onPause()
     }
 }

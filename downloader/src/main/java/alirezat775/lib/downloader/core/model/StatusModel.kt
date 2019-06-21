@@ -1,10 +1,15 @@
 package alirezat775.lib.downloader.core.model
 
-object StatusModel {
+/**
+ * Author:  Alireza Tizfahm Fard
+ * Date:    21/6/2019
+ * Email:   alirezat775@gmail.com
+ */
 
-    val NEW = 1
-    val DOWNLOADING = 2
-    val SUCCESS = 3
-    val FAIL = 4
-    val PAUSE = 5
+internal object StatusModel {
+    const val NEW = 1
+    const val DOWNLOADING = 2
+    const val SUCCESS = 3
+    const val FAIL = 4
+    const val PAUSE = 5
 }

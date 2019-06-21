@@ -7,10 +7,11 @@ import androidx.annotation.RequiresPermission
 
 /**
  * Author:  Alireza Tizfahm Fard
- * Date:    17/09/2017
+ * Date:    21/6/2019
  * Email:   alirezat775@gmail.com
  */
-object ConnectCheckerHelper {
+
+internal object ConnectCheckerHelper {
 
     private const val TYPE_WIFI = 1
     private const val TYPE_MOBILE = 2

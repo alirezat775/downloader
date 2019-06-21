@@ -1,0 +1,9 @@
+Downloader 1.0.0 Released!
+
+- pause, resume, cancel, queue
+- multi download
+- add header request
+- set download directory
+- set time out connection
+- show progress download (percent, downloaded size, total size)
+- event every action (onStart, onPause, onResume, onProgress, onComplete, onFailure, onCancel)

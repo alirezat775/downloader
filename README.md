@@ -34,3 +34,6 @@ add to module build.gradle
 ```
 
 <img src="https://raw.githubusercontent.com/alirezat775/downloader/master/assets/demo.gif" width="200" height="400" />
+
+
+- [changelog](CHANGELOG)

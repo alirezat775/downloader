@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private fun getDownloader() {
         downloader = Downloader.Builder(
             this,
-            "https://dl3.android30t.com/apps/Q-U/Instagram-v79.0.0.21.101(Android30t.Com).apk"
+            "https://s3-us-west-2.amazonaws.com/uw-s3-cdn/wp-content/uploads/sites/6/2017/11/04133712/waterfall.jpg"
         ).downloadListener(object : OnDownloadListener {
             override fun onStart() {
                 handler.post { current_status_txt.text = "onStart" }
@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity() {
                 handler.post {
                     current_status_txt.text = "onProgressUpdate"
                     percent_txt.text = percent.toString().plus("%")
-                    size_txt.text = downloadedSize.toString()
-                    total_size_txt.text = totalSize.toString()
+                    size_txt.text = getSize(downloadedSize)
+                    total_size_txt.text = getSize(totalSize)
                     download_progress.progress = percent
                 }
                 Log.d(
@@ -86,5 +86,25 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "onCancel")
             }
         }).build()
+    }
+
+    fun getSize(size: Int): String {
+        var s = ""
+        val kb = (size / 1024).toDouble()
+        val mb = kb / 1024
+        val gb = kb / 1024
+        val tb = kb / 1024
+        if (size < 1024) {
+            s = "$size Bytes"
+        } else if (size >= 1024 && size < 1024 * 1024) {
+            s = String.format("%.2f", kb) + " KB"
+        } else if (size >= 1024 * 1024 && size < 1024 * 1024 * 1024) {
+            s = String.format("%.2f", mb) + " MB"
+        } else if (size >= 1024 * 1024 * 1024 && size < 1024 * 1024 * 1024 * 1024) {
+            s = String.format("%.2f", gb) + " GB"
+        } else if (size >= 1024 * 1024 * 1024 * 1024) {
+            s = String.format("%.2f", tb) + " TB"
+        }
+        return s
     }
 }

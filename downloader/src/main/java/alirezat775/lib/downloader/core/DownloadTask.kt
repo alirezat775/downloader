@@ -86,28 +86,10 @@ internal data class DownloadTask(
             connection?.connect()
 
             // get filename and file extension
-            val contentType = connection?.getHeaderField("Content-Type").toString()
-            if (fileName == null) {
+            detectFileName()
 
-                val raw = connection?.getHeaderField("Content-Disposition")
-                if (raw?.indexOf("=") != -1) {
-                    fileName = raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()?.get(1)
-                }
-
-                if (fileName == null) {
-                    fileName = url.substringAfterLast("/")
-                }
-
-                fileName =
-                    if (fileName == null) System.currentTimeMillis().toString()
-                    else fileName
-
-                extension = MimeHelper.guessExtensionFromMimeType(contentType)
-            }
-
-            // check download file directory
+            // check file size
             if (!resume) totalSize = connection?.contentLength!!
-            val fileDownloadDir = File(downloadDir)
 
             // downloaded file
             downloadedFile = File(downloadDir + File.separator + fileName + "." + extension)
@@ -130,8 +112,7 @@ internal data class DownloadTask(
             var previousPercent = -1
 
             // update percent, size file downloaded
-            while (bufferedInputStream.read(buffer, 0, 1024) >= 0 && !isCancelled) {
-                len = bufferedInputStream.read(buffer, 0, 1024)
+            while (bufferedInputStream.read(buffer, 0, 1024).also { len = it } >= 0 && !isCancelled) {
                 if (!ConnectCheckerHelper.isInternetAvailable(context.get()!!)) {
                     return Pair(false, IllegalStateException("Please check your network!"))
                 }
@@ -182,5 +163,24 @@ internal data class DownloadTask(
         cancel(true)
         dao?.updateDownload(url, StatusModel.PAUSE, percent, downloadedSize, totalSize)
         downloadListener?.onPause()
+    }
+
+    private fun detectFileName() {
+        val contentType = connection?.getHeaderField("Content-Type").toString()
+        if (fileName == null) {
+
+            val raw = connection?.getHeaderField("Content-Disposition")
+            if (raw?.indexOf("=") != -1) {
+                fileName = raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()?.get(1)
+            }
+
+            if (fileName == null) fileName = url.substringAfterLast("/")
+
+            fileName =
+                if (fileName == null) System.currentTimeMillis().toString()
+                else fileName
+
+            extension = MimeHelper.guessExtensionFromMimeType(contentType)
+        }
     }
 }

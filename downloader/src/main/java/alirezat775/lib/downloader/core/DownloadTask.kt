@@ -176,6 +176,7 @@ internal data class DownloadTask(
                     raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }
                         ?.toTypedArray()?.get(1)
                         ?.replace("\"", "")
+                fileName = fileName?.lastIndexOf(".")?.let { fileName?.substring(0, it) }
             }
 
             if (fileName == null) {

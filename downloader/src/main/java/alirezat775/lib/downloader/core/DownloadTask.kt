@@ -64,6 +64,7 @@ internal data class DownloadTask(
             connection?.doInput = true
             connection?.readTimeout = timeOut
             connection?.connectTimeout = timeOut
+            connection?.instanceFollowRedirects = true
             connection?.requestMethod = ConnectionHelper.GET
 
             //set header request
@@ -171,10 +172,16 @@ internal data class DownloadTask(
 
             val raw = connection?.getHeaderField("Content-Disposition")
             if (raw?.indexOf("=") != -1) {
-                fileName = raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()?.get(1)
+                fileName =
+                    raw?.split("=".toRegex())?.dropLastWhile { it.isEmpty() }
+                        ?.toTypedArray()?.get(1)
+                        ?.replace("\"", "")
             }
 
-            if (fileName == null) fileName = url.substringAfterLast("/")
+            if (fileName == null) {
+                fileName = url.substringAfterLast("/")
+                fileName = fileName?.lastIndexOf(".")?.let { fileName?.substring(0, it) }
+            }
 
             fileName =
                 if (fileName == null) System.currentTimeMillis().toString()

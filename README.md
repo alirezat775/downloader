@@ -29,7 +29,7 @@ add to root build.gradle
 add to module build.gradle
 ```groovy
 
-    implementation 'com.github.alirezat775:downloader:1.0.0'
+    implementation 'com.github.alirezat775:downloader:{latest-version}'
 
 ```
 

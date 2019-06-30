@@ -3,7 +3,16 @@ package alirezat775.lib.downloader.helper
 import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import android.net.NetworkInfo
+import androidx.core.content.ContextCompat.getSystemService
+
+
+
 
 /**
  * Author:  Alireza Tizfahm Fard
@@ -13,51 +22,14 @@ import androidx.annotation.RequiresPermission
 
 internal object ConnectCheckerHelper {
 
-    private const val TYPE_WIFI = 1
-    private const val TYPE_MOBILE = 2
-
     /**
      * @param context
      * @return boolean
      */
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET])
     fun isInternetAvailable(context: Context): Boolean {
-        val isConnected: Boolean
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = cm.activeNetworkInfo
-        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting
-        return isConnected
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val activeNetworkInfo = connectivityManager!!.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
-
-
-    /**
-     * @param context
-     * @return int
-     */
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET])
-    fun connectionType(context: Context): Int {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = cm.activeNetworkInfo
-        if (null != activeNetwork) {
-            if (activeNetwork.type == ConnectivityManager.TYPE_WIFI)
-                return TYPE_WIFI
-            if (activeNetwork.type == ConnectivityManager.TYPE_MOBILE)
-                return TYPE_MOBILE
-        }
-        return 0
-    }
-
-    /**
-     * @param connectionType
-     * @return string
-     */
-    fun connectionTypeChecker(connectionType: Int): String? {
-        var type: String? = null
-        when (connectionType) {
-            TYPE_WIFI -> type = "TYPE_WIFI"
-            TYPE_MOBILE -> type = "TYPE_MOBILE"
-        }
-        return type
-    }
-
 }

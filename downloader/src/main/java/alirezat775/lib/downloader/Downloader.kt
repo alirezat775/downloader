@@ -18,7 +18,7 @@ import java.net.MalformedURLException
  * Email:   alirezat775@gmail.com
  */
 
-class Downloader private constructor(private val downloadTask: DownloadTask) : IDownload {
+class Downloader private constructor(downloadTask: DownloadTask) : IDownload {
 
     //region field
     private var mDownloadTask: DownloadTask? = null

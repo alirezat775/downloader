@@ -1,7 +1,7 @@
 package alirezat775.lib.downloader.core
 
 import alirezat775.lib.downloader.core.database.DownloaderDao
-import alirezat775.lib.downloader.core.model.FileModel
+import alirezat775.lib.downloader.core.model.DownloaderData
 import alirezat775.lib.downloader.core.model.StatusModel
 import alirezat775.lib.downloader.helper.ConnectCheckerHelper
 import alirezat775.lib.downloader.helper.ConnectionHelper
@@ -33,8 +33,7 @@ internal data class DownloadTask(
     val header: Map<String, String>? = null,
     var fileName: String? = null,
     var extension: String? = null
-) :
-    AsyncTask<Void, Void, Pair<Boolean, Exception?>>() {
+) : AsyncTask<Void, Void, Pair<Boolean, Exception?>>() {
 
     // region field
     internal var resume: Boolean = false
@@ -50,7 +49,7 @@ internal data class DownloadTask(
         // check resume file
         downloadListener?.onStart()
         if (!resume) {
-            dao?.insertNewDownload(FileModel(0, url, fileName, StatusModel.NEW, 0, 0, 0))
+            dao?.insertNewDownload(DownloaderData(0, url, fileName, StatusModel.NEW, 0, 0, 0))
         } else {
             downloadListener?.onResume()
         }
@@ -76,7 +75,7 @@ internal data class DownloadTask(
 
             // check file resume able if true set last size to request header
             if (resume) {
-                val model = dao?.getDownload(url)
+                val model = dao?.getDownloadByUrl(url)
                 percent = model?.percent!!
                 downloadedSize = model.size
                 totalSize = model.totalSize

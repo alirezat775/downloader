@@ -6,6 +6,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+/**
+ * Author:  Alireza Tizfahm Fard
+ * Date:    21/6/2019
+ * Email:   alirezat775@gmail.com
+ */
 @Database(entities = [DownloaderData::class], version = 1, exportSchema = false)
 internal abstract class DownloaderDatabase : RoomDatabase() {
 

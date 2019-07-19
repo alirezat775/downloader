@@ -6,6 +6,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
+/**
+ * Author:  Alireza Tizfahm Fard
+ * Date:    21/6/2019
+ * Email:   alirezat775@gmail.com
+ */
 @Dao
 internal interface DownloaderDao {
 

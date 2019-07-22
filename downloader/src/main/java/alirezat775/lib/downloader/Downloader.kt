@@ -2,7 +2,7 @@ package alirezat775.lib.downloader
 
 import alirezat775.lib.downloader.core.DownloadTask
 import alirezat775.lib.downloader.core.OnDownloadListener
-import alirezat775.lib.downloader.core.database.DownloaderDao
+import alirezat775.lib.downloader.core.database.DownloaderDatabase
 import alirezat775.lib.downloader.helper.ConnectionHelper
 import android.Manifest
 import android.content.Context
@@ -144,7 +144,7 @@ class Downloader private constructor(private val downloadTask: DownloadTask) : I
             val downloadTask = DownloadTask(
                 mUrl,
                 WeakReference(mContext),
-                DownloaderDao.getInstance(mContext),
+                DownloaderDatabase.getAppDatabase(mContext).downloaderDao(),
                 mDownloadDir,
                 mTimeOut,
                 mDownloadListener,
